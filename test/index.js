@@ -43,7 +43,7 @@ test('Export observations as OSM JSON', function (t) {
   const ids = ['5376464111285135', '3698308318298018']
   const expected = require('./fixtures/observations.json')
 
-  obsExport.osmJson(ids, function (err, observations) {
+  obsExport.osmObjects(ids, function (err, observations) {
     if (snapshot) writeSnapshot('observations.json', observations)
     t.error(err)
     t.deepEqual(observations, expected)
@@ -57,7 +57,7 @@ test('Export new nodes as OSM JSON with observations', function (t) {
   const expected = require('./fixtures/with_nodes.json')
   const opts = {linkedNodes: true}
 
-  obsExport.osmJson(ids, opts, function (err, entities) {
+  obsExport.osmObjects(ids, opts, function (err, entities) {
     t.error(err)
     if (snapshot) writeSnapshot('with_nodes.json', entities)
     t.deepEqual(entities, expected)

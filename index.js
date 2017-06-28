@@ -2,7 +2,7 @@ const once = require('once')
 const createApi = require('osm-p2p-server/api')
 const from = require('from2-array')
 const collect = require('collect-stream')
-const toOsmXml = require('obj2Osm')
+const toOsmXml = require('obj2osm')
 const omit = require('lodash/omit')
 
 const assign = Object.assign
@@ -92,9 +92,8 @@ proto.osmChangeJson = function (observationOsmIds, opts, cb) {
     opts = {}
   }
   cb = once(cb)
-  const self = this
 
-  self.osmObjects(observationOsmIds, {linkedNodes: true}, flattenJson)
+  this.osmObjects(observationOsmIds, {linkedNodes: true}, flattenJson)
 
   function flattenJson (err, observations) {
     if (err) return cb(err)
