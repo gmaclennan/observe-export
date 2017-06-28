@@ -24,7 +24,7 @@ const proto = ObserveExport.prototype
 // linked to.
 // If 'opts.linkedNodes' is truthy, the 'node' OSM documents that are linked to
 // will also be included in the results.
-proto.getObservationsFromIDs = function (observationOsmIds, opts, cb) {
+proto.osmObjects = function (observationOsmIds, opts, cb) {
   if (arguments.length === 2 && typeof opts === 'function') {
     cb = opts
     opts = {}
@@ -94,7 +94,7 @@ proto.osmChangeJson = function (observationOsmIds, opts, cb) {
   cb = once(cb)
   const self = this
 
-  self.getObservationsFromIDs(observationOsmIds, {linkedNodes: true}, flattenJson)
+  self.osmObjects(observationOsmIds, {linkedNodes: true}, flattenJson)
 
   function flattenJson (err, observations) {
     if (err) return cb(err)
