@@ -119,6 +119,9 @@ proto.osmChangeJson = function (ids, opts, cb) {
           modified.push(newNode)
         }
       })
+    created.forEach((node, i) => {
+      node.id = '-' + (i + 1)
+    })
     cb(null, created.concat(modified))
   }
 }
