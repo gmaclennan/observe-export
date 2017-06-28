@@ -3,6 +3,7 @@ const createApi = require('osm-p2p-server/api')
 const from = require('from2-array')
 const collect = require('collect-stream')
 const toOsmXml = require('obj2Osm')
+const omit = require('lodash/omit')
 
 const assign = Object.assign
 
@@ -121,6 +122,7 @@ proto.osmChangeJson = function (ids, opts, cb) {
       })
     created.forEach((node, i) => {
       node.id = '-' + (i + 1)
+      created[i] = omit(node, 'version')
     })
     cb(null, created.concat(modified))
   }
