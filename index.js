@@ -2,7 +2,7 @@ const once = require('once')
 const createApi = require('osm-p2p-server/api')
 const from = require('from2-array')
 const collect = require('collect-stream')
-const toOsmXml = require('obj2Osm')
+const toOsmXml = require('obj2osm')
 const omit = require('lodash/omit')
 
 const assign = Object.assign
@@ -18,7 +18,13 @@ function ObserveExport (osmOrgDb, obsDb, obsIndex) {
 
 const proto = ObserveExport.prototype
 
-proto.osmJson = function (ids, opts, cb) {
+// Given a list of OSM IDs of 'observation'-type documents, return a mapping of
+// these IDs to the actual observation documents, with a 'links' property added
+// to each document, that is a list of 'node' OSM IDs that the observation is
+// linked to.
+// If 'opts.linkedNodes' is truthy, the 'node' OSM documents that are linked to
+// will also be included in the results.
+proto.osmObjects = function (observationOsmIds, opts, cb) {
   if (arguments.length === 2 && typeof opts === 'function') {
     cb = opts
     opts = {}
@@ -28,14 +34,14 @@ proto.osmJson = function (ids, opts, cb) {
   const observations = {}
   const observationLinks = []
   let result
-  let pending = ids.length * 2
+  let pending = observationOsmIds.length * 2
 
-  ids.forEach(id => {
-    self.apiObs.getElement(id, onObs)
-    self.obsIndex.links(id, onLinks)
+  observationOsmIds.forEach(id => {
+    self.apiObs.getElement(id, onObservation)
+    self.obsIndex.links(id, onObsevationLinks)
   })
 
-  function onObs (err, forks) {
+  function onObservation (err, forks) {
     if (err && err.name !== 'NotFoundError') return cb(err)
     if (forks && forks.length) {
       const obs = latest(forks)
@@ -44,7 +50,7 @@ proto.osmJson = function (ids, opts, cb) {
     done()
   }
 
-  function onLinks (err, links) {
+  function onObsevationLinks (err, links) {
     if (err) return cb(err)
     if (!links.length) return done()
     Array.prototype.push.apply(observationLinks, links.map(valueOf))
@@ -80,19 +86,18 @@ proto.osmJson = function (ids, opts, cb) {
   }
 }
 
-proto.osmChangeJson = function (ids, opts, cb) {
+proto.osmChangeJson = function (observationOsmIds, opts, cb) {
   if (arguments.length === 2 && typeof opts === 'function') {
     cb = opts
     opts = {}
   }
   cb = once(cb)
-  const self = this
 
-  self.osmJson(ids, {linkedNodes: true}, flattenJson)
+  this.osmObjects(observationOsmIds, {linkedNodes: true}, flattenJson)
 
-  function flattenJson (err, osmJson) {
+  function flattenJson (err, observations) {
     if (err) return cb(err)
-    const observationsByNode = osmJson.filter(isObs)
+    const observationsByNode = observations.filter(isObs)
       .reduce((acc, obs) => {
         ;(obs.links || []).forEach(id => {
           acc[id] = acc[id] || []
@@ -103,7 +108,7 @@ proto.osmChangeJson = function (ids, opts, cb) {
     const created = []
     const modified = []
 
-    osmJson.filter(isNode)
+    observations.filter(isNode)
       .forEach(node => {
         const nodeObservations = observationsByNode[node.id]
         if (!nodeObservations || !nodeObservations.length) return
@@ -128,13 +133,13 @@ proto.osmChangeJson = function (ids, opts, cb) {
   }
 }
 
-proto.osmChangeXml = function (ids, opts, cb) {
+proto.osmChangeXml = function (observationOsmIds, opts, cb) {
   if (arguments.length === 2 && typeof opts === 'function') {
     cb = opts
     opts = {}
   }
   cb = once(cb)
-  this.osmChangeJson(ids, opts, function (err, osmChange) {
+  this.osmChangeJson(observationOsmIds, opts, function (err, osmChange) {
     if (err) return cb(err)
     const rs = from.obj(osmChange).pipe(toOsmXml())
     collect(rs, cb)
