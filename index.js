@@ -1,5 +1,10 @@
 const once = require('once')
 const createApi = require('osm-p2p-server/api')
+const from = require('from2-array')
+const collect = require('collect-stream')
+const toOsmXml = require('obj2Osm')
+
+const assign = Object.assign
 
 module.exports = ObserveExport
 
@@ -74,9 +79,69 @@ proto.osmJson = function (ids, opts, cb) {
   }
 }
 
+proto.osmChangeJson = function (ids, opts, cb) {
+  if (arguments.length === 2 && typeof opts === 'function') {
+    cb = opts
+    opts = {}
+  }
+  cb = once(cb)
+  const self = this
+
+  self.osmJson(ids, {linkedNodes: true}, flattenJson)
+
+  function flattenJson (err, osmJson) {
+    if (err) return cb(err)
+    const observationsByNode = osmJson.filter(isObs)
+      .reduce((acc, obs) => {
+        ;(obs.links || []).forEach(id => {
+          acc[id] = acc[id] || []
+          acc[id].push(obs)
+        })
+        return acc
+      }, {})
+    const created = []
+    const modified = []
+
+    osmJson.filter(isNode)
+      .forEach(node => {
+        const nodeObservations = observationsByNode[node.id]
+        if (!nodeObservations || !nodeObservations.length) return
+        const newTags = [node.tags]
+          .concat(nodeObservations.sort(cmpFork).map(tagsOf))
+        const newNode = assign({}, node, {
+          tags: assign.apply(null, newTags)
+        })
+        if (hasPlaceholderId(newNode)) {
+          newNode.action = 'create'
+          created.push(newNode)
+        } else {
+          newNode.action = 'modify'
+          modified.push(newNode)
+        }
+      })
+    cb(null, created.concat(modified))
+  }
+}
+
+proto.osmChangeXml = function (ids, opts, cb) {
+  if (arguments.length === 2 && typeof opts === 'function') {
+    cb = opts
+    opts = {}
+  }
+  cb = once(cb)
+  this.osmChangeJson(ids, opts, function (err, osmChange) {
+    if (err) return cb(err)
+    const rs = from.obj(osmChange).pipe(toOsmXml())
+    collect(rs, cb)
+  })
+}
+
+function isNode (entity) { return entity.type === 'node' }
+function isObs (entity) { return entity.type === 'observation' }
 function values (o) { return Object.keys(o).map(k => o[k]) }
 function latest (forks) { return forks.sort(cmpFork)[0] }
 function valueOf (doc) { return doc.value }
+function tagsOf (entity) { return entity.tags }
 function hasPlaceholderId (entity) { return entity.id.charAt(0) === '-' }
 
 /**

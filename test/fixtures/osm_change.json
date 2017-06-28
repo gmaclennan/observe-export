@@ -1,0 +1,30 @@
+[
+  {
+    "type": "node",
+    "lon": -140.12,
+    "lat": 62.23,
+    "tags": {
+      "osm-p2p:id": "-134157188637252613",
+      "caption": "oil in the river",
+      "category": "contamination",
+      "media": "2016-12-02_15h24_63ec3720a6a5f.jpg"
+    },
+    "id": "-134157188637252613",
+    "version": "0186b5b4eb3c54e6b7f7938d3b30e17d30dbd5ddb5dfb6b25ffb54f4b35914ef",
+    "action": "create"
+  },
+  {
+    "type": "node",
+    "lon": -147.92,
+    "lat": 64.51,
+    "tags": {
+      "building": "residential",
+      "caption": "pipeline break",
+      "category": "contamination",
+      "media": "2016-12-02_15h51_d57362a9a06e7.jpg"
+    },
+    "id": "7188637216252609",
+    "version": "e987f1923ba51cca5cd5000d44862b2d89ce50cd7e20eb45287bcd6ae27ef8ed",
+    "action": "modify"
+  }
+]
