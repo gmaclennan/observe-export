@@ -27,10 +27,11 @@ const memdb = require('memdb')
 const OBS = require('osm-p2p-observations')
 const ObserveExport = require('../')
 
-const osm = osmdb()
-const obs = OBS({ db: memdb(), log: osm.log })
+const osmOrgdb = osmdb()
+const obsDb = osmdb()
+const obsIndex = OBS({ db: memdb(), log: osm.log })
 
-const observeExport = new ObserveExport(osm, obs)
+const observeExport = new ObserveExport(osmOrgDb, obsDb, obsIndex)
 
 const ids = ['12345', '54321']
 
