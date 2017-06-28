@@ -1,0 +1,54 @@
+[
+  {
+    "type": "observation",
+    "lon": -147.93,
+    "lat": 64.51,
+    "timestamp": "2017-06-28T00:53:31.774Z",
+    "tags": {
+      "caption": "oil in the river",
+      "category": "contamination",
+      "media": "2016-12-02_15h24_63ec3720a6a5f.jpg"
+    },
+    "id": "5376464111285135",
+    "version": "756bf111237c3864bc603baa8e91b5f8a027b7c5ca36c8dbb47f6750dfbf656f",
+    "links": [
+      "-134157188637252613"
+    ]
+  },
+  {
+    "type": "observation",
+    "lon": -149.95,
+    "lat": 64.49,
+    "timestamp": "2017-06-27T00:00:00.000Z",
+    "tags": {
+      "caption": "pipeline break",
+      "category": "contamination",
+      "media": "2016-12-02_15h51_d57362a9a06e7.jpg"
+    },
+    "id": "3698308318298018",
+    "version": "2077b36881d361798cf8e6221bf24f0e547e96afd1290d5981bc8f0c0df2625a",
+    "links": [
+      "7188637216252609"
+    ]
+  },
+  {
+    "type": "node",
+    "lon": -140.12,
+    "lat": 62.23,
+    "tags": {
+      "osm-p2p:id": "-134157188637252613"
+    },
+    "id": "-134157188637252613",
+    "version": "0186b5b4eb3c54e6b7f7938d3b30e17d30dbd5ddb5dfb6b25ffb54f4b35914ef"
+  },
+  {
+    "type": "node",
+    "lon": -147.92,
+    "lat": 64.51,
+    "tags": {
+      "building": "residential"
+    },
+    "id": "7188637216252609",
+    "version": "e987f1923ba51cca5cd5000d44862b2d89ce50cd7e20eb45287bcd6ae27ef8ed"
+  }
+]
