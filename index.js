@@ -1,14 +1,13 @@
 const once = require('once')
 const createApi = require('osm-p2p-server/api')
-const assign = Object.assign
 
 module.exports = ObserveExport
 
-function ObserveExport (osm, obs) {
-  if (!(this instanceof ObserveExport)) return new ObserveExport(osm, obs)
-  this.osm = osm
-  this.obs = obs
-  this.api = createApi(this.osm)
+function ObserveExport (osmOrgDb, obsDb, obsIndex) {
+  if (!(this instanceof ObserveExport)) return new ObserveExport(osmOrgDb, obsDb, obsIndex)
+  this.obsIndex = obsIndex
+  this.apiOsm = createApi(osmOrgDb)
+  this.apiObs = createApi(obsDb)
 }
 
 const proto = ObserveExport.prototype
@@ -26,8 +25,8 @@ proto.osmJson = function (ids, opts, cb) {
   let pending = ids.length * 2
 
   ids.forEach(id => {
-    self.api.getElement(id, onObs)
-    self.obs.links(id, onLinks)
+    self.apiObs.getElement(id, onObs)
+    self.obsIndex.links(id, onLinks)
   })
 
   function onObs (err, forks) {
@@ -57,9 +56,10 @@ proto.osmJson = function (ids, opts, cb) {
     result = values(observations)
     if (!opts.linkedNodes) return cb(null, result)
 
-    pending = observationLinks.length
+    pending = observationLinks.length * 2
     observationLinks.forEach(link => {
-      self.api.getElement(link.link, onNode)
+      self.apiObs.getElement(link.link, onNode)
+      self.apiOsm.getElement(link.link, onNode)
     })
   }
 

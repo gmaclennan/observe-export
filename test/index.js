@@ -1,39 +1,45 @@
 const test = require('tape')
 const osmdb = require('osm-p2p-mem')
 const memdb = require('memdb')
-const collect = require('collect-stream')
 const OBS = require('osm-p2p-observations')
-const omit = require('lodash/omit')
 const fs = require('fs')
 const path = require('path')
-const assign = Object.assign
 
 const ObserveExport = require('../')
 
-const osm = osmdb()
-const obs = OBS({ db: memdb(), log: osm.log })
-const docs = require('./fixtures/import.json')
+const osmOrgDb = osmdb()
+const obsDb = osmdb()
+const obsIndex = OBS({ db: memdb(), log: obsDb.log })
+const obsDbFixture = require('./fixtures/obs_db_import.json')
+const osmOrgDbFixture = require('./fixtures/osm_org_db_import.json')
 let snapshot = false
 
 if (process.argv[2] === 'snapshot') {
   snapshot = true
 }
 
+const snapshotDir = path.join(__dirname, 'fixtures')
 function writeSnapshot (filename, data) {
-  fs.writeFileSync(path.join(__dirname, 'fixtures', filename), JSON.stringify(data, null, 2))
+  fs.writeFileSync(path.join(snapshotDir, filename), JSON.stringify(data, null, 2))
 }
 
 test('Populate db with fixture', function (t) {
-  osm.batch(docs, function (err, nodes) {
+  t.plan(3)
+
+  obsDb.batch(obsDbFixture, function (err, nodes) {
     t.error(err)
-    obs.ready(function () {
-      t.end()
+    obsIndex.ready(function () {
+      t.pass()
     })
+  })
+
+  osmOrgDb.batch(osmOrgDbFixture, function (err, nodes) {
+    t.error(err)
   })
 })
 
 test('Export observations as OSM JSON', function (t) {
-  const obsExport = new ObserveExport(osm, obs)
+  const obsExport = new ObserveExport(osmOrgDb, obsDb, obsIndex)
   const ids = ['5376464111285135', '3698308318298018']
 
   obsExport.osmJson(ids, function (err, observations) {
@@ -46,7 +52,7 @@ test('Export observations as OSM JSON', function (t) {
 })
 
 test('Export new nodes as OSM JSON with observations', function (t) {
-  const obsExport = new ObserveExport(osm, obs)
+  const obsExport = new ObserveExport(osmOrgDb, obsDb, obsIndex)
   const ids = ['5376464111285135', '3698308318298018']
 
   const opts = {

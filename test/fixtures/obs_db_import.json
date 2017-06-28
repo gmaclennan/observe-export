@@ -31,18 +31,6 @@
   },
   {
     "type": "put",
-    "key": "7188637216252609",
-    "value": {
-      "type": "node",
-      "lon": -147.92,
-      "lat": 64.51,
-      "tags": {
-        "building": "residential"
-      }
-    }
-  },
-  {
-    "type": "put",
     "value": {
       "type": "observation-link",
       "link": "7188637216252609",
