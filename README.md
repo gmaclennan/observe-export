@@ -47,6 +47,14 @@ observeExport.osmJson(ids, {linkedNodes: true}, function (err, data) {
 
 ## API
 
+### var observeExport = new ObserveExport(osm, obs)
+
+### observeExport.osmObjects(observationIds, [opts], [cb])
+
+### observationIds.osmChangeJson(observationIds, [opts], [cb])
+
+### observationIds.osmChangeXml(observationIds, [opts], [cb])
+
 ## Contribute
 
 PRs accepted.
