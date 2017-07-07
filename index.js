@@ -198,7 +198,7 @@ ObserveExport.prototype.osmChangeXml = function (observationOsmIds, opts, cb) {
     opts = {}
   }
   cb = once(cb)
-  this.osmChangeJson(observationOsmIds, opts, function (err, osmChange) {
+  this.osmChange(observationOsmIds, opts, function (err, osmChange) {
     if (err) return cb(err)
     const rs = from.obj(osmChange).pipe(toOsmXml())
     collect(rs, cb)
