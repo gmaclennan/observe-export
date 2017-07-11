@@ -71,7 +71,7 @@ ObserveExport.prototype.osmObjects = function (observationOsmIds, opts, cb) {
     if (!links.length) return done()
     // Use this push to avoid creating multiple arrays with `concat`
     // which would need to be garbage collected
-    Array.ObserveExport.prototypetype.push.apply(observationLinks, links.map(valueOf))
+    Array.prototype.push.apply(observationLinks, links.map(valueOf))
     done()
   }
 
@@ -198,7 +198,7 @@ ObserveExport.prototype.osmChangeXml = function (observationOsmIds, opts, cb) {
     opts = {}
   }
   cb = once(cb)
-  this.osmChangeJson(observationOsmIds, opts, function (err, osmChange) {
+  this.osmChange(observationOsmIds, opts, function (err, osmChange) {
     if (err) return cb(err)
     const rs = from.obj(osmChange).pipe(toOsmXml())
     collect(rs, cb)
